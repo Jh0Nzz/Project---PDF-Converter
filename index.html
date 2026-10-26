@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF para Word</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#eef2f8;margin:0;color:#0f172a;line-height:1.5}
+.wrap{max-width:880px;margin:0 auto;padding:28px 20px}
+h1{font-size:1.75rem;font-weight:700;margin:0 0 8px;letter-spacing:-.01em;color:#0b1a3c}
+.topo{background:linear-gradient(90deg,#0b1a3c,#1e3a8a);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.marca{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem}
+.logo{background:#fff;color:#1e3a8a;border-radius:8px;padding:4px 8px;font-size:.8rem;font-weight:800}
+.topo small{opacity:.85;font-size:.85rem}
+.rodape{max-width:880px;margin:0 auto;padding:24px 20px 36px;color:#5b6475;font-size:.85rem;border-top:1px solid #d9e0ec;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.sub{color:#5b6475;margin:0 0 20px;line-height:1.5}
+.card{background:#fff;border:1px solid #dbe3f0;border-radius:12px;padding:24px;box-shadow:0 1px 3px rgba(15,27,60,.06),0 8px 24px rgba(15,27,60,.06)}
+.drop{display:block;width:100%;border:2px dashed #93a4d6;border-radius:10px;padding:32px 16px;text-align:center;cursor:pointer;background:#f7f9fd}
+.drop.over{background:#eaecff}
+.drop b{display:block;font-size:1.05rem;margin-bottom:6px}
+.drop span{display:block;color:#5b6475;font-size:.95rem;line-height:1.4;pointer-events:none}
+.drop b{pointer-events:none}
+.drop:focus-within{outline:2px solid #4f5fe6;outline-offset:2px}
+#fname{margin-top:12px;font-size:.95rem;color:#1d2330;word-break:break-all}
+button{background:#1e3a8a;color:#fff;border:0;border-radius:8px;padding:13px 18px;font-size:1rem;font-weight:600;cursor:pointer;width:100%}
+button:disabled{opacity:.5;cursor:default}
+.bar{height:8px;background:#e6e9f2;border-radius:6px;overflow:hidden;margin-top:16px}
+.bar i{display:block;height:100%;width:0;background:#4f5fe6;transition:width .2s}
+#log{font-size:.95rem;color:#5b6475;margin-top:12px;min-height:1.3em;line-height:1.4}
+input[type=file]{display:none}
+.modos{display:flex;gap:8px;background:#e9eef7;border-radius:10px;padding:4px;margin-bottom:16px}
+.modos button{flex:1;width:auto;background:transparent;color:#1e3a8a;padding:10px 12px;font-size:.95rem}
+.modos button.ativo{background:#1e3a8a;color:#fff}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:16px}
+.stats div{background:#f7f9fd;border:1px solid #dbe3f0;border-radius:10px;padding:10px 12px;font-size:.85rem;color:#5b6475}
+.stats b{display:block;font-size:1.3rem;color:#0b1a3c}
+#dlwrap{margin-top:14px}
+.passos{margin:0 0 16px;padding-left:22px;line-height:1.6;color:#2c3445}
+.passos li{margin-bottom:6px}
+.dica{background:#fff8e6;border-left:4px solid #f0b429;border-radius:10px;padding:12px 14px;font-size:.95rem;line-height:1.5;margin-bottom:18px}
+.faq{padding-top:0}
+.faq h2{font-size:1.2rem;margin:8px 0 12px}
+details{background:#fff;border-radius:12px;padding:12px 16px;margin-bottom:10px;box-shadow:0 2px 10px rgba(20,30,60,.06)}
+summary{cursor:pointer;font-weight:600}
+details p{color:#5b6475;line-height:1.5;margin:8px 0 0}
+</style>
+</head>
+<body>
+<header class="topo"><div class="marca"><span class="logo">PDF</span><span>Conversor PDF para Word</span></div><small>Ambiente seguro: seus arquivos não saem do navegador</small></header>
+<div class="wrap">
+  <h1 id="titulo">Transforme seu PDF em Word editável</h1>
+  <p class="sub">Envie o arquivo, clique em converter e pronto: o arquivo é baixado no seu aparelho. Tudo acontece no seu navegador, sem enviar o documento para nenhum servidor.</p>
+<ol class="passos">
+<li><b>Escolha o arquivo</b> arrastando-o para a caixa ou tocando nela.</li>
+<li><b>Clique em Converter</b> e aguarde a barra chegar ao fim.</li>
+<li><b>Abra o arquivo</b> que foi baixado e edite como quiser.</li>
+</ol>
+<div class="dica"><b>Antes de começar:</b> o PDF precisa ter texto que você consegue selecionar com o mouse. Se não consegue marcar as palavras, o arquivo é uma foto ou digitalização, e esta versão não consegue ler.</div>
+  <div class="card">
+    <div class="modos"><button type="button" id="m-pdf" class="ativo">PDF para Word</button><button type="button" id="m-docx">Word para PDF</button></div>
+    <label class="drop" id="drop" tabindex="0">
+      <b id="dropt">Toque aqui para escolher o seu PDF</b>
+      <span id="drops">ou arraste o arquivo para esta caixa (somente .pdf)</span>
+      <input type="file" id="file" accept="application/pdf,.pdf">
+    </label>
+    <div id="fname"></div>
+    <div style="margin-top:16px"><button id="go" disabled>Converter para Word</button></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log"></div>
+    <div id="stats"></div>
+    <div id="dlwrap"></div>
+  </div>
+</div>
+<div class="wrap faq">
+  <h2>Perguntas frequentes</h2>
+  <details><summary>O Word fica igual ao PDF?</summary><p>Ele mantém o texto editável, o tamanho da página, as margens, as quebras de página, as linhas, os quadros desenhados e as imagens (como brasões e logotipos), na mesma posição. Desenhos muito complexos são copiados como imagem e não podem ser editados como desenho.</p></details>
+  <details><summary>No modo Word para PDF, o que é mantido?</summary><p>O layout do Word é desenhado página por página: margens, tabelas com bordas, imagens, negrito, itálico, listas, cabeçalho e rodapé. Caixas de texto e formas flutuantes podem não aparecer.</p></details>
+  <details><summary>Meus arquivos ficam salvos na internet?</summary><p>Não. A conversão acontece no seu navegador e o arquivo não é enviado para nenhum servidor.</p></details>
+  <details><summary>Por que aparece o aviso de que não há texto selecionável?</summary><p>Porque o PDF é uma imagem ou foi digitalizado. Esta versão não faz leitura de imagem (OCR).</p></details>
+</div>
+<footer class="rodape"><span>Conversor PDF para Word</span><span>Conversão feita no seu navegador</span></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx-preview@0.1.15/dist/docx-preview.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const $=id=>document.getElementById(id);
+const drop=$('drop'), fileIn=$('file'), btn=$('go'), log=$('log'), bar=$('bar');
+let pdfBuf=null, baseName='documento', mode='pdf';
+function setLog(t){log.textContent=t}
+function setMode(m){
+  mode=m;
+  pdfBuf=null;
+  btn.disabled=true;
+  bar.style.width='0';
+  $('fname').textContent='';
+  $('stats').innerHTML='';
+  $('dlwrap').innerHTML='';
+  const isPdf=m==='pdf';
+  $('m-pdf').classList.toggle('ativo',isPdf);
+  $('m-docx').classList.toggle('ativo',!isPdf);
+  $('titulo').textContent=isPdf?'Transforme seu PDF em Word editável':'Transforme seu Word em PDF';
+  $('dropt').textContent=isPdf?'Toque aqui para escolher o seu PDF':'Toque aqui para escolher o seu Word';
+  $('drops').textContent=isPdf?'ou arraste o arquivo para esta caixa (somente .pdf)':'ou arraste o arquivo para esta caixa (somente .docx)';
+  fileIn.accept=isPdf?'application/pdf,.pdf':'.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  btn.textContent=isPdf?'Converter para Word':'Converter para PDF';
+  setLog('');
+}
+async function convertDocx(){
+  btn.disabled=true;
+  bar.style.width='0';
+  $('stats').innerHTML='';
+  $('dlwrap').innerHTML='';
+  let host=null;
+  try{
+    if(!window.docx||!window.docx.renderAsync) throw new Error('Não consegui carregar o motor de layout do Word. Verifique a conexão e recarregue a página.');
+    setLog('Lendo o Word…');
+    bar.style.width='10%';
+    host=document.createElement('div');
+    host.style.cssText='position:absolute;left:0;top:0;z-index:-1;pointer-events:none;background:#ffffff';
+    const styles=document.createElement('div');
+    const body=document.createElement('div');
+    host.appendChild(styles);
+    host.appendChild(body);
+    document.body.appendChild(host);
+    const blob=new Blob([pdfBuf.slice(0)],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+    await window.docx.renderAsync(blob,body,styles,{
+      inWrapper:true,
+      ignoreWidth:false,
+      ignoreHeight:false,
+      breakPages:true,
+      renderHeaders:true,
+      renderFooters:true,
+      renderFootnotes:true,
+      useBase64URL:true
+    });
+    if(document.fonts&&document.fonts.ready) await document.fonts.ready;
+    let secs=[...body.querySelectorAll('section.docx')];
+    if(!secs.length) secs=[...body.querySelectorAll('section')];
+    if(!secs.length) throw new Error('Não encontrei conteúdo neste Word.');
+    const st=contar(secs.map(sec=>({
+      W:0,H:0,shapes:[],
+      lines:sec.innerText.split(/\n+/).map(t=>t.replace(/\s+/g,' ').trim()).filter(Boolean)
+        .map((t,j)=>({y:j*30,x0:0,x1:0,size:10,serif:false,runs:[{t,b:false}]}))
+    })));
+    setLog('Montando o PDF com a estrutura do Word…');
+    const {jsPDF}=window.jspdf;
+    let pdf=null;
+    for(let i=0;i<secs.length;i++){
+      const sec=secs[i];
+      setLog(`Desenhando página ${i+1} de ${secs.length}…`);
+      bar.style.width=(15+((i+1)/secs.length)*80)+'%';
+      const rect=sec.getBoundingClientRect();
+      const wPt=rect.width*0.75, hPt=rect.height*0.75;
+      const canvas=await html2canvas(sec,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false});
+      const img=canvas.toDataURL('image/jpeg',0.92);
+      const orient=wPt>hPt?'l':'p';
+      if(!pdf) pdf=new jsPDF({unit:'pt',format:[wPt,hPt],orientation:orient});
+      else pdf.addPage([wPt,hPt],orient);
+      pdf.addImage(img,'JPEG',0,0,wPt,hPt);
+    }
+    $('stats').innerHTML=`<div class="stats"><div><b>${st.letras}</b>letras (sem espaços)</div><div><b>${st.chars}</b>caracteres (com espaços)</div><div><b>${st.palavras}</b>palavras</div><div><b>${st.frases}</b>frases</div><div><b>${st.paragrafos}</b>parágrafos</div><div><b>${pdf.getNumberOfPages()}</b>páginas</div></div>`;
+    const out=pdf.output('blob');
+    bar.style.width='100%';
+    const dl=document.createElement('button');
+    dl.textContent='Baixar PDF';
+    dl.onclick=()=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(out);
+      a.download=baseName+'.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    };
+    $('dlwrap').appendChild(dl);
+    setLog('Confira a contagem acima e clique em Baixar PDF.');
+  }catch(e){
+    setLog('Erro: '+e.message);
+  }finally{
+    if(host) host.remove();
+    btn.disabled=false;
+  }
+}
+function load(f){
+  if(!f||(mode==='pdf'?!(f.type==='application/pdf'||/\.pdf$/i.test(f.name)):!/\.docx$/i.test(f.name))){setLog(mode==='pdf'?'Envie um arquivo PDF.':'Envie um arquivo Word (.docx).');return}
+  baseName=f.name.replace(/\.(pdf|docx)$/i,'');
+  $('fname').textContent=f.name;
+  f.arrayBuffer().then(b=>{pdfBuf=b;btn.disabled=false;setLog('Pronto. Clique em converter.')});
+}
+fileIn.addEventListener('change',e=>{load(e.target.files[0]);e.target.value=''});
+$('m-pdf').addEventListener('click',()=>setMode('pdf'));
+$('m-docx').addEventListener('click',()=>setMode('docx'));
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over')});
+drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+['dragover','drop'].forEach(t=>window.addEventListener(t,e=>{if(!drop.contains(e.target))e.preventDefault()}));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');load(e.dataTransfer.files[0])});
+function esc(s){
+  return s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function addRun(runs,t,b){
+  const L=runs[runs.length-1];
+  if(L&&L.b===b&&t!=='\t'&&L.t!=='\t'){L.t+=t}else runs.push({t,b});
+}
+function groupLines(items){
+  items.sort((a,b)=>a.y-b.y||a.x-b.x);
+  const rows=[];
+  for(const it of items){
+    const r=rows[rows.length-1];
+    if(r&&Math.abs(r.y-it.y)<Math.max(1.5,it.size*0.35)) r.items.push(it);
+    else rows.push({y:it.y,items:[it]});
+  }
+  return rows.map(r=>{
+    r.items.sort((a,b)=>a.x-b.x);
+    const size=Math.max(...r.items.map(i=>i.size));
+    const runs=[];
+    let end=null;
+    for(const it of r.items){
+      if(end!==null){
+        const gap=it.x-end;
+        if(gap>size*1.5) addRun(runs,'\t',false);
+        else if(gap>size*0.12) addRun(runs,' ',it.b);
+      }
+      addRun(runs,it.s,it.b);
+      end=it.x+it.w;
+    }
+    return {y:r.y,x0:r.items[0].x,x1:end,size,serif:r.items[0].serif,runs};
+  });
+}
+// Lê linhas, quadros e caixas (retângulos e linhas) e marca as áreas gráficas complexas
+// (curvas, brasões, imagens) em "regs", inclusive dentro de blocos internos do PDF.
+function readShapes(ol,H,W,regs){
+  const O=pdfjsLib.OPS, out=[], stk=[];
+  const PAINT=[O.stroke,O.closeStroke,O.fill,O.eoFill,O.fillStroke,O.eoFillStroke,O.closeFillStroke,O.closeEOFillStroke].filter(x=>x!==undefined);
+  let m=[1,0,0,1,0,0], cur=null, lw=1;
+  const mul=(A,B)=>[A[0]*B[0]+A[1]*B[2],A[0]*B[1]+A[1]*B[3],A[2]*B[0]+A[3]*B[2],A[2]*B[1]+A[3]*B[3],A[4]*B[0]+A[5]*B[2]+B[4],A[4]*B[1]+A[5]*B[3]+B[5]];
+  const P=(x,y)=>[m[0]*x+m[2]*y+m[4],H-(m[1]*x+m[3]*y+m[5])];
+  for(let i=0;i<ol.fnArray.length;i++){
+    const f=ol.fnArray[i], a=ol.argsArray[i]||[];
+    if(f===O.save) stk.push(m);
+    else if(f===O.restore){ if(stk.length) m=stk.pop(); }
+    else if(f===O.transform) m=mul(a,m);
+    else if(f===O.paintFormXObjectBegin){
+      stk.push(m);
+      const fm=a[0];
+      if(Array.isArray(fm)&&fm.length===6) m=mul(fm,m);
+    }
+    else if(f===O.paintFormXObjectEnd){ if(stk.length) m=stk.pop(); }
+    else if(f===O.setLineWidth) lw=a[0];
+    else if(f===O.paintImageXObject||f===O.paintInlineImageXObject||f===O.paintImageMaskXObject){
+      if(regs){
+        const cs=[P(0,0),P(1,0),P(0,1),P(1,1)];
+        const xs=cs.map(c=>c[0]), ys=cs.map(c=>c[1]);
+        regs.push({x0:Math.min(...xs),y0:Math.min(...ys),x1:Math.max(...xs),y1:Math.max(...ys)});
+      }
+    }
+    else if(f===O.constructPath){
+      const ops=a[0]||[], c=a[1]||[], got=[], wlw=Math.max(0.5,Math.abs(lw*m[0]));
+      const bb=[Infinity,Infinity,-Infinity,-Infinity];
+      const add=q=>{bb[0]=Math.min(bb[0],q[0]);bb[1]=Math.min(bb[1],q[1]);bb[2]=Math.max(bb[2],q[0]);bb[3]=Math.max(bb[3],q[1]);};
+      let curve=false;
+      let k=0;
+      for(const op of ops){
+        if(op===O.moveTo){ cur=P(c[k],c[k+1]); add(cur); k+=2; }
+        else if(op===O.lineTo){
+          const q=P(c[k],c[k+1]); k+=2; add(q);
+          if(cur&&got.length<400) got.push({x1:cur[0],y1:cur[1],x2:q[0],y2:q[1],lw:wlw});
+          cur=q;
+        }
+        else if(op===O.curveTo){
+          for(let j=0;j<3;j++) add(P(c[k+2*j],c[k+2*j+1]));
+          k+=6; curve=true; cur=null;
+        }
+        else if(op===O.curveTo2||op===O.curveTo3){
+          for(let j=0;j<2;j++) add(P(c[k+2*j],c[k+2*j+1]));
+          k+=4; curve=true; cur=null;
+        }
+        else if(op===O.rectangle){
+          const x=c[k],y=c[k+1],w=c[k+2],h=c[k+3]; k+=4;
+          const p1=P(x,y), p2=P(x+w,y+h);
+          add(p1); add(p2);
+          const rw=Math.abs(p2[0]-p1[0]), rh=Math.abs(p2[1]-p1[1]);
+          if(rw>W*0.9&&rh>H*0.9) continue;
+          if(got.length<400) got.push({r:true,x:Math.min(p1[0],p2[0]),y:Math.min(p1[1],p2[1]),w:rw,h:rh,lw:wlw});
+        }
+      }
+      if(PAINT.includes(ol.fnArray[i+1])){
+        out.push(...got);
+        if(regs&&curve&&bb[0]!==Infinity) regs.push({x0:bb[0],y0:bb[1],x1:bb[2],y1:bb[3]});
+      }
+    }
+  }
+  return out;
+}
+// Agrupa áreas que se tocam (com uma pequena folga) em um único retângulo
+function clusterRegions(rs,pad){
+  let cl=rs.map(r=>({x0:r.x0,y0:r.y0,x1:r.x1,y1:r.y1}));
+  let changed=true;
+  while(changed){
+    changed=false;
+    outer:
+    for(let i=0;i<cl.length;i++){
+      for(let j=i+1;j<cl.length;j++){
+        const a=cl[i], b=cl[j];
+        if(a.x0<=b.x1+pad&&b.x0<=a.x1+pad&&a.y0<=b.y1+pad&&b.y0<=a.y1+pad){
+          cl[i]={x0:Math.min(a.x0,b.x0),y0:Math.min(a.y0,b.y0),x1:Math.max(a.x1,b.x1),y1:Math.max(a.y1,b.y1)};
+          cl.splice(j,1);
+          changed=true;
+          break outer;
+        }
+      }
+    }
+  }
+  return cl;
+}
+// Copia as áreas gráficas (brasões, imagens, desenhos curvos) do PDF já desenhado, em alta resolução
+async function graphicImages(page,vp,items,regs){
+  const big=r=>(r.x1-r.x0)>vp.width*0.9&&(r.y1-r.y0)>vp.height*0.9;
+  const cand=regs.filter(r=>r.x1-r.x0>=1&&r.y1-r.y0>=1&&!big(r)).slice(0,300);
+  if(!cand.length) return [];
+  const cl=clusterRegions(cand,2).filter(r=>!big(r)&&r.x1-r.x0>=2&&r.y1-r.y0>=2);
+  const free=cl.filter(r=>!items.some(t=>t.x<r.x1&&t.x+t.w>r.x0&&t.y-t.size<r.y1&&t.y+t.size*0.25>r.y0));
+  if(!free.length) return [];
+  const S=3, vp3=page.getViewport({scale:S});
+  const cv=document.createElement('canvas');
+  cv.width=Math.ceil(vp3.width); cv.height=Math.ceil(vp3.height);
+  await page.render({canvasContext:cv.getContext('2d'),viewport:vp3}).promise;
+  const out=[];
+  for(const r of free){
+    const x=Math.max(0,Math.floor(r.x0*S)), y=Math.max(0,Math.floor(r.y0*S));
+    const w=Math.min(cv.width-x,Math.ceil((r.x1-r.x0)*S)), h=Math.min(cv.height-y,Math.ceil((r.y1-r.y0)*S));
+    if(w<2||h<2) continue;
+    const c=document.createElement('canvas');
+    c.width=w; c.height=h;
+    c.getContext('2d').drawImage(cv,x,y,w,h,0,0,w,h);
+    out.push({x:x/S,y:y/S,w:w/S,h:h/S,png:c.toDataURL('image/png')});
+  }
+  return out;
+}
+async function extractPages(data,onProg){
+  const pdf=await pdfjsLib.getDocument({data}).promise;
+  const pages=[];
+  for(let n=1;n<=pdf.numPages;n++){
+    if(onProg) onProg(n,pdf.numPages);
+    const page=await pdf.getPage(n);
+    const vp=page.getViewport({scale:1});
+    const tc=await page.getTextContent();
+    const items=[];
+    for(const it of tc.items){
+      if(!it.str||!it.str.trim()) continue;
+      const st=tc.styles[it.fontName]||{};
+      const fam=(st.fontFamily||'').toLowerCase();
+      const size=Math.hypot(it.transform[2],it.transform[3])||it.height||10;
+      const info=(it.fontName+' '+fam).toLowerCase();
+      items.push({
+        s:it.str,
+        x:it.transform[4],
+        y:vp.height-it.transform[5],
+        size,
+        w:it.width||0,
+        b:/bold|black|heavy|semibold|negrito/.test(info),
+        serif:/serif/.test(fam)&&!/sans/.test(fam)
+      });
+    }
+    const ol=await page.getOperatorList();
+    const regs=[];
+    const shapes=readShapes(ol,vp.height,vp.width,regs);
+    let images=[];
+    try{ images=await graphicImages(page,vp,items,regs); }catch(e){ images=[]; }
+    pages.push({W:vp.width,H:vp.height,lines:groupLines(items),shapes,images});
+  }
+  return pages;
+}
+function contar(pages){
+  let paragrafos=0, texto='';
+  pages.forEach(p=>{
+    let prev=null;
+    p.lines.forEach(l=>{
+      const t=l.runs.map(r=>r.t==='\t'?' ':r.t).join('').trim();
+      if(!t) return;
+      if(!prev||l.y-prev.y>Math.max(prev.size,l.size)*1.8) paragrafos++;
+      texto+=t+'\n';
+      prev=l;
+    });
+  });
+  const palavras=texto.split(/\s+/).filter(Boolean).length;
+  const frases=(texto.match(/[.!?…]+(?=\s|$)/g)||[]).length;
+  return {
+    letras:(texto.match(/\p{L}/gu)||[]).length,
+    chars:texto.replace(/\n/g,'').length,
+    palavras,
+    frases:frases||(palavras?1:0),
+    paragrafos,
+    paginas:pages.length
+  };
+}
+const R=n=>Math.round(n*20);
+const clampT=v=>Math.round(Math.min(1500,Math.max(0,v))*20);
+function margins(p){
+  const L=p.lines;
+  if(!L.length) return {t:R(36),r:R(36),b:R(36),l:R(36)};
+  const minX=Math.min(...L.map(l=>l.x0));
+  const maxX=Math.max(...L.map(l=>l.x1));
+  const first=L[0], last=L[L.length-1];
+  return {
+    t:clampT(first.y-first.size*0.8),
+    l:clampT(minX),
+    r:clampT(p.W-maxX),
+    b:clampT(p.H-last.y)
+  };
+}
+function sectXml(p){
+  const m=margins(p);
+  return `<w:sectPr><w:pgSz w:w="${R(p.W)}" w:h="${R(p.H)}"/><w:pgMar w:top="${m.t}" w:right="${m.r}" w:bottom="${m.b}" w:left="${m.l}" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr>`;
+}
+function runsXml(l){
+  const font=l.serif?'Times New Roman':'Arial';
+  const sz=Math.min(144,Math.max(4,Math.round(l.size*2)));
+  return l.runs.map(r=>{
+    const rpr=`<w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:cs="${font}"/>${r.b?'<w:b/>':''}<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/></w:rPr>`;
+    if(r.t==='\t') return `<w:r>${rpr}<w:tab/></w:r>`;
+    return `<w:r>${rpr}<w:t xml:space="preserve">${esc(r.t)}</w:t></w:r>`;
+  }).join('');
+}
+function shapesXml(p){
+  const n2=n=>n.toFixed(2);
+  return (p.shapes||[]).map(s=>{
+    let x,y,w,h,fill=false;
+    if(s.r){
+      x=s.x; y=s.y; w=s.w; h=s.h;
+      if(Math.min(w,h)<1.5){ fill=true; w=Math.max(w,0.5); h=Math.max(h,0.5); }
+    }else{
+      if(Math.abs(s.y1-s.y2)<1){ x=Math.min(s.x1,s.x2); y=s.y1-s.lw/2; w=Math.abs(s.x2-s.x1); h=s.lw; fill=true; }
+      else if(Math.abs(s.x1-s.x2)<1){ x=s.x1-s.lw/2; y=Math.min(s.y1,s.y2); w=s.lw; h=Math.abs(s.y2-s.y1); fill=true; }
+      else return '';
+      if(w<0.5&&h<0.5) return '';
+    }
+    const st=`position:absolute;margin-left:${n2(x)}pt;margin-top:${n2(y)}pt;width:${n2(w)}pt;height:${n2(h)}pt;z-index:-1;mso-position-horizontal-relative:page;mso-position-vertical-relative:page`;
+    const sty=fill?'fillcolor="#000000" stroked="f"':`filled="f" strokecolor="#000000" strokeweight="${n2(s.lw)}pt"`;
+    return `<w:r><w:pict><v:rect style="${st}" ${sty}/></w:pict></w:r>`;
+  }).join('');
+}
+async function buildDocx(pages){
+  const media=[];
+  const EMU=v=>Math.max(0,Math.round(v*12700));
+  function imagesXml(p){
+    return (p.images||[]).map(im=>{
+      const n=media.length+1, rid='rIdImg'+n;
+      media.push({n,rid,data:im.png.split(',')[1]});
+      const cx=EMU(im.w), cy=EMU(im.h), id=100+n;
+      return `<w:r><w:drawing><wp:anchor distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="${n}" behindDoc="1" locked="0" layoutInCell="1" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="page"><wp:posOffset>${EMU(im.x)}</wp:posOffset></wp:positionH><wp:positionV relativeFrom="page"><wp:posOffset>${EMU(im.y)}</wp:posOffset></wp:positionV><wp:extent cx="${cx}" cy="${cy}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapNone/><wp:docPr id="${id}" name="Imagem ${n}"/><wp:cNvGraphicFramePr/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${id}" name="Imagem ${n}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${rid}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r>`;
+    }).join('');
+  }
+  const drawXml=p=>shapesXml(p)+imagesXml(p);
+  let body='';
+  pages.forEach(p=>{
+    const L=p.lines;
+    if(!L.length){
+      body+=`<w:p><w:pPr>${sectXml(p)}</w:pPr>${drawXml(p)}</w:p>`;
+      return;
+    }
+    const minX=Math.min(...L.map(l=>l.x0));
+    L.forEach((l,i)=>{
+      const prev=L[i-1];
+      let before=0;
+      if(prev) before=Math.min(300,Math.max(0,l.y-prev.y-Math.max(prev.size,l.size)*1.15));
+      const ind=Math.max(0,R(l.x0-minX));
+      const sect=(i===L.length-1)?sectXml(p):'';
+      body+=`<w:p><w:pPr><w:spacing w:before="${R(before)}" w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:left="${ind}"/>${sect}</w:pPr>${i===0?drawXml(p):''}${runsXml(l)}</w:p>`;
+    });
+  });
+  const finalSect=pages.length?pages[pages.length-1]:{W:612,H:792,lines:[]};
+  const docXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:body>${body}${sectXml(finalSect)}</w:body></w:document>`;
+  const CT=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`;
+  const RELS=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
+  const DOCRELS=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${media.map(m=>`<Relationship Id="${m.rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image${m.n}.png"/>`).join('')}</Relationships>`;
+  const zip=new JSZip();
+  zip.file('[Content_Types].xml',CT);
+  zip.file('_rels/.rels',RELS);
+  zip.file('word/document.xml',docXml);
+  zip.file('word/_rels/document.xml.rels',DOCRELS);
+  media.forEach(m=>zip.file(`word/media/image${m.n}.png`,m.data,{base64:true}));
+  return zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+}
+btn.addEventListener('click',async()=>{
+  if(mode==='docx') return convertDocx();
+  btn.disabled=true;
+  bar.style.width='0';
+  $('stats').innerHTML='';
+  $('dlwrap').innerHTML='';
+  try{
+    const pages=await extractPages(pdfBuf.slice(0),(n,t)=>{
+      setLog(`Lendo página ${n} de ${t}…`);
+      bar.style.width=(n/t*70)+'%';
+    });
+    if(!pages.some(p=>p.lines.length||p.images.length)){
+      throw new Error('Este PDF não tem texto selecionável (provavelmente é escaneado). Esta versão não faz OCR.');
+    }
+    setLog('Contando o texto…');
+    const st=contar(pages);
+    $('stats').innerHTML=`<div class="stats"><div><b>${st.letras}</b>letras (sem espaços)</div><div><b>${st.chars}</b>caracteres (com espaços)</div><div><b>${st.palavras}</b>palavras</div><div><b>${st.frases}</b>frases</div><div><b>${st.paragrafos}</b>parágrafos</div><div><b>${st.paginas}</b>páginas</div></div>`;
+    setLog('Montando o Word…');
+    const blob=await buildDocx(pages);
+    bar.style.width='100%';
+    const dl=document.createElement('button');
+    dl.textContent='Baixar Word';
+    dl.onclick=()=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download=baseName+'.docx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    };
+    $('dlwrap').appendChild(dl);
+    setLog('Confira a contagem acima e clique em Baixar Word.');
+  }catch(e){
+    setLog('Erro: '+e.message);
+  }finally{
+    btn.disabled=false;
+  }
+});
+</script>
+</body>
+</html>
